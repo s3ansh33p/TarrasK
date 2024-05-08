@@ -1,0 +1,28 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${SDK_DIR}/include/**",
+                "/toolchain/sh4aeb-elf/sys-include/**"
+            ],
+            "defines": [],
+            "compilerPath": "/toolchain/bin/sh4-elf-g++",
+            "compilerArgs": [
+                "-ffreestanding",
+                "-fno-exceptions",
+                "-fno-rtti",
+                "-fshort-wchar",
+                "-Wall",
+                "-Wextra",
+                "-O2",
+                "-I $(SDK_DIR)/include/",
+                "-m4a-nofpu",
+                "-I $/toolchain/sh4aeb-elf/sys-include/"
+            ],
+            "configurationProvider": "ms-vscode.makefile-tools"
+        }
+    ],
+    "version": 4
+}

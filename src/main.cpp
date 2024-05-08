@@ -26,7 +26,7 @@
 APP_NAME("TarrasK")
 APP_DESCRIPTION("RE Toolkit")
 APP_AUTHOR("Phoebe C.")
-APP_VERSION("1.0.0")
+APP_VERSION("1.0.1")
 #endif
 
 struct CPUState {
@@ -345,45 +345,9 @@ private:
     GUIButton m_close;
 };
 
-extern "C"
-#ifdef PC
-int  main(){
-#else
-void main(){
-#endif
+extern "C" int __attribute__((section(".bootstrap.text"))) main(void) {
     BreakpointDialog dialog;
     dialog.ShowDialog();
 
-#ifdef PC
-    return 0;
-#endif
+    exit(EXIT_SUCCESS);
 }
-
-//
-//extern "C"
-//void main() {
-//	calcInit(); //backup screen and init some variables
-//
-//	fillScreen(color(0,0,0));
-//
-//	float testVersion = 1.0;
-//	//Example for Debug_Printf(x,y,invert_color,0,format_string) //(small text)
-//
-//	Debug_Printf(0,0,true,0,"TarrasK %.2f",testVersion);
-//
-////	Debug_Printf(10,4,true,0,"ceil %f",ceil(3.6));
-//
-//
-//	LCD_Refresh();
-//
-//	//Example for getKey
-//	while(true){
-//		uint32_t key1, key2;	//First create variables
-//		getKey(&key1, &key2);	//then read the keys
-//		if(testKey(key1, key2, KEY_CLEAR)){ //Use testKey() to tests if a specific key is pressed
-//			break;
-//		}
-//	}
-//
-//	calcEnd(); //restore screen and do stuff
-//}

@@ -1,2 +1,12 @@
 /docs/_res/
 /target/
+
+# Compiled files
+*.o
+*.hhk
+*.bin
+dist
+
+# some temporary files under wsl
+*~
+.*~
