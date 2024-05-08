@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "qrcodegen.h"
 #include "utils.h"
 
 /*
@@ -52,6 +53,9 @@ struct CPUState {
   uint32_t macl;
 };
 
+// Defined later
+void showQRCode(char *text, int x_start, int y_start, int cell_size);
+
 // Defined in breakpoint_handler_stub.s
 extern "C" void BreakpointHandlerStub();
 
@@ -62,6 +66,28 @@ extern "C" void BreakpointHandlerStub();
  */
 extern "C" void BreakpointHandler(struct CPUState *cpuState) {
 
+  // copy state of the CPU
+  struct CPUState cpuStateCopy = {.r0 = cpuState->r0,
+                                  .r1 = cpuState->r1,
+                                  .r2 = cpuState->r2,
+                                  .r3 = cpuState->r3,
+                                  .r4 = cpuState->r4,
+                                  .r5 = cpuState->r5,
+                                  .r6 = cpuState->r6,
+                                  .r7 = cpuState->r7,
+                                  .r8 = cpuState->r8,
+                                  .r9 = cpuState->r9,
+                                  .r10 = cpuState->r10,
+                                  .r11 = cpuState->r11,
+                                  .r12 = cpuState->r12,
+                                  .r13 = cpuState->r13,
+                                  .r14 = cpuState->r14,
+                                  .r15 = cpuState->r15,
+                                  .gbr = cpuState->gbr,
+                                  .pr = cpuState->pr,
+                                  .mach = cpuState->mach,
+                                  .macl = cpuState->macl};
+
   int carret_x = 0;
 
   Debug_SetCursorPosition(0, 0);
@@ -71,108 +97,173 @@ extern "C" void BreakpointHandler(struct CPUState *cpuState) {
       ":: TRK :: Breakpoint                               ::"); //(small text)
 
   Debug_Printf(0, ++carret_x, true, 0, " r0  %08X r1  %08X r2  %08X r3  %08X ",
-               cpuState->r0, cpuState->r1, cpuState->r2,
-               cpuState->r3); //(small text)
+               cpuStateCopy.r0, cpuStateCopy.r1, cpuStateCopy.r2,
+               cpuStateCopy.r3); //(small text)
   Debug_Printf(0, ++carret_x, true, 0, " r4  %08X r5  %08X r6  %08X r7  %08X ",
-               cpuState->r4, cpuState->r5, cpuState->r6,
-               cpuState->r7); //(small text)
+               cpuStateCopy.r4, cpuStateCopy.r5, cpuStateCopy.r6,
+               cpuStateCopy.r7); //(small text)
   Debug_Printf(0, ++carret_x, true, 0, " r8  %08X r9  %08X r10 %08X r11 %08X ",
-               cpuState->r8, cpuState->r9, cpuState->r10,
-               cpuState->r11); //(small text)
+               cpuStateCopy.r8, cpuStateCopy.r9, cpuStateCopy.r10,
+               cpuStateCopy.r11); //(small text)
   Debug_Printf(0, ++carret_x, true, 0, " r12 %08X r13 %08X r14 %08X r15 %08X ",
-               cpuState->r12, cpuState->r13, cpuState->r14,
-               cpuState->r15); //(small text)
+               cpuStateCopy.r12, cpuStateCopy.r13, cpuStateCopy.r14,
+               cpuStateCopy.r15); //(small text)
   Debug_Printf(0, ++carret_x, true, 0, " gbr %08X pr  %08X ach %08X acl %08X ",
                cpuState->gbr, cpuState->pr, cpuState->mach,
                cpuState->macl); //(small text)
   Debug_Printf(0, ++carret_x, false, 0,
                " r| Hex Dump                          | Ascii        ");
 
-  uint32_t registerAddr = cpuState->r0;
+  uint32_t registerAddr = cpuStateCopy.r0;
   if (isAddressWritable(registerAddr)) {
     // Try to dump its content, EG for strings
     carret_x = printBytes(registerAddr, 0, ++carret_x);
   }
-  registerAddr = cpuState->r1;
+  registerAddr = cpuStateCopy.r1;
   if (isAddressWritable(registerAddr)) {
     carret_x = printBytes(registerAddr, 1, ++carret_x);
   }
-  registerAddr = cpuState->r2;
+  registerAddr = cpuStateCopy.r2;
   if (isAddressWritable(registerAddr)) {
     carret_x = printBytes(registerAddr, 2, ++carret_x);
   }
-  registerAddr = cpuState->r3;
+  registerAddr = cpuStateCopy.r3;
   if (isAddressWritable(registerAddr)) {
     carret_x = printBytes(registerAddr, 3, ++carret_x);
   }
-  registerAddr = cpuState->r4;
+  registerAddr = cpuStateCopy.r4;
   if (isAddressWritable(registerAddr)) {
     carret_x = printBytes(registerAddr, 4, ++carret_x);
   }
-  registerAddr = cpuState->r5;
+  registerAddr = cpuStateCopy.r5;
   if (isAddressWritable(registerAddr)) {
     carret_x = printBytes(registerAddr, 5, ++carret_x);
   }
-  registerAddr = cpuState->r6;
+  registerAddr = cpuStateCopy.r6;
   if (isAddressWritable(registerAddr)) {
     carret_x = printBytes(registerAddr, 6, ++carret_x);
   }
-  registerAddr = cpuState->r7;
+  registerAddr = cpuStateCopy.r7;
   if (isAddressWritable(registerAddr)) {
     carret_x = printBytes(registerAddr, 7, ++carret_x);
   }
-  registerAddr = cpuState->r8;
+  registerAddr = cpuStateCopy.r8;
   if (isAddressWritable(registerAddr)) {
     carret_x = printBytes(registerAddr, 8, ++carret_x);
   }
-  registerAddr = cpuState->r9;
+  registerAddr = cpuStateCopy.r9;
   if (isAddressWritable(registerAddr)) {
     carret_x = printBytes(registerAddr, 9, ++carret_x);
   }
-  registerAddr = cpuState->r10;
+  registerAddr = cpuStateCopy.r10;
   if (isAddressWritable(registerAddr)) {
     carret_x = printBytes(registerAddr, 10, ++carret_x);
   }
-  registerAddr = cpuState->r11;
+  registerAddr = cpuStateCopy.r11;
   if (isAddressWritable(registerAddr)) {
     carret_x = printBytes(registerAddr, 11, ++carret_x);
   }
-  registerAddr = cpuState->r12;
+  registerAddr = cpuStateCopy.r12;
   if (isAddressWritable(registerAddr)) {
     carret_x = printBytes(registerAddr, 12, ++carret_x);
   }
-  registerAddr = cpuState->r14;
+  registerAddr = cpuStateCopy.r14;
   if (isAddressWritable(registerAddr)) {
     carret_x = printBytes(registerAddr, 14, ++carret_x);
   }
-  registerAddr = cpuState->r15;
+  registerAddr = cpuStateCopy.r15;
   if (isAddressWritable(registerAddr)) {
     carret_x = printBytes(registerAddr, 15, ++carret_x);
   }
 
   LCD_Refresh();
 
+  // wait for key press
+  while (true) {
+    uint32_t key1, key2; // First create variables
+    key1 = 0;
+    key2 = 0;
+    getKey(&key1, &key2); // then read the keys
+    if (testKey(
+            key1, key2,
+            KEY_CLEAR)) { // Use testKey() to tests if a specific key is pressed
+      break;
+    }
+  }
+
+  // SECOND SET OF INFO - just for testing to see values change
+  Debug_Printf(0, 0, false, 0,
+               ":: TRK :: Breakpoint                               ::");
+  Debug_Printf(0, 1, true, 0, " r0  %08X r1  %08X r2  %08X r3  %08X ",
+               cpuStateCopy.r0, cpuStateCopy.r1, cpuStateCopy.r2,
+               cpuStateCopy.r3);
+  Debug_Printf(0, 2, true, 0, " r4  %08X r5  %08X r6  %08X r7  %08X ",
+               cpuStateCopy.r4, cpuStateCopy.r5, cpuStateCopy.r6,
+               cpuStateCopy.r7);
+  Debug_Printf(0, 3, true, 0, " r8  %08X r9  %08X r10 %08X r11 %08X ",
+               cpuStateCopy.r8, cpuStateCopy.r9, cpuStateCopy.r10,
+               cpuStateCopy.r11);
+  Debug_Printf(0, 4, true, 0, " r12 %08X r13 %08X r14 %08X r15 %08X ",
+               cpuStateCopy.r12, cpuStateCopy.r13, cpuStateCopy.r14,
+               cpuStateCopy.r15);
+  Debug_Printf(0, 5, true, 0, " gbr %08X pr  %08X ach %08X acl %08X ",
+               cpuStateCopy.gbr, cpuStateCopy.pr, cpuStateCopy.mach,
+               cpuStateCopy.macl);
+
+  LCD_Refresh();
+
+  // wait for key press
+  while (true) {
+    uint32_t key1, key2; // First create variables
+    key1 = 0;
+    key2 = 0;
+    getKey(&key1, &key2); // then read the keys
+    if (testKey(
+            key1, key2,
+            KEY_CLEAR)) { // Use testKey() to tests if a specific key is pressed
+      break;
+    }
+  }
+
+  // qrcode with r0
+  char qrText[300];
+  sprintf(
+      qrText,
+      "START DUMP r0: %08X r1: %08X r2: %08X r3: %08X r4: %08X r5: %08X r6: "
+      "%08X r7: %08X r8: %08X r9: %08X r10: %08X r11: %08X r12: "
+      "%08X r13: %08X r14: %08X r15: %08X gbr: %08X pr: %08X mach: "
+      "%08X macl: %08X END DUMP",
+      cpuStateCopy.r0, cpuStateCopy.r1, cpuStateCopy.r2, cpuStateCopy.r3,
+      cpuStateCopy.r4, cpuStateCopy.r5, cpuStateCopy.r6, cpuStateCopy.r7,
+      cpuStateCopy.r8, cpuStateCopy.r9, cpuStateCopy.r10, cpuStateCopy.r11,
+      cpuStateCopy.r12, cpuStateCopy.r13, cpuStateCopy.r14, cpuStateCopy.r15,
+      cpuStateCopy.gbr, cpuStateCopy.pr, cpuStateCopy.mach, cpuStateCopy.macl);
+  showQRCode(qrText, 5, 150, 5);
+
+  LCD_Refresh();
+
   // Add virtual delay so that we can read the text
-  //    int8_t i = 80;
-  //    while (i > 0) {
-  //        // Eat CPU cycles + Kool animation ! :D
-  //        switch (i%4) {
-  //            case 0:
-  //                Debug_Printf(0,0,false,0,"::");
-  //                break;
-  //            case 1:
-  //                Debug_Printf(0,0,false,0,".:");
-  //                break;
-  //            case 2:
-  //                Debug_Printf(0,0,false,0,"..");
-  //                break;
-  //            case 3:
-  //                Debug_Printf(0,0,false,0,":.");
-  //                break;
-  //        }
-  ////        LCD_Refresh();
-  //        asm volatile ("nop"::);
-  //    }
+  // int8_t i = 40;
+  // while (i > 0) {
+  //   // Eat CPU cycles + Kool animation ! :D
+  //   switch (i % 4) {
+  //   case 0:
+  //     Debug_Printf(0, 0, false, 0, "::");
+  //     break;
+  //   case 1:
+  //     Debug_Printf(0, 0, false, 0, ".:");
+  //     break;
+  //   case 2:
+  //     Debug_Printf(0, 0, false, 0, "..");
+  //     break;
+  //   case 3:
+  //     Debug_Printf(0, 0, false, 0, ":.");
+  //     break;
+  //   }
+  //   LCD_Refresh();
+  //   asm volatile("nop" ::);
+  //   i--;
+  // }
 
   while (true) {
     uint32_t key1, key2; // First create variables
@@ -346,9 +437,51 @@ private:
   GUIButton m_close;
 };
 
+/**
+ * Initializes the calculator and sets up the breakpoint handler.
+ */
+void showQRCode(char *text, int x_start, int y_start, int cell_size) {
+  // QR code on launch for testing
+  // const char *text = "MY MESSAGE";                  // User-supplied text
+  enum qrcodegen_Ecc errCorLvl = qrcodegen_Ecc_LOW; // Error correction level
+
+  // Make and print the QR Code symbol
+  uint8_t qrcode[qrcodegen_BUFFER_LEN_MAX];
+  uint8_t tempBuffer[qrcodegen_BUFFER_LEN_MAX];
+  bool ok = qrcodegen_encodeText(text, tempBuffer, qrcode, errCorLvl,
+                                 qrcodegen_VERSION_MIN, qrcodegen_VERSION_MAX,
+                                 qrcodegen_Mask_AUTO, true);
+  if (ok) {
+    // display
+    int qrSize = qrcodegen_getSize(qrcode);
+    // int x_start = 5;
+    // int y_start = 5;
+    // int cell_size = 3;
+    for (int y = 0; y < qrSize; y++) {
+      for (int x = 0; x < qrSize; x++) {
+        int col = qrcodegen_getModule(qrcode, x, y) ? color(0, 0, 0)
+                                                    : color(255, 255, 255);
+        for (int i = 0; i < cell_size; i++) {
+          for (int j = 0; j < cell_size; j++) {
+            setPixel(x_start + x * cell_size + i, y_start + y * cell_size + j,
+                     col);
+          }
+        }
+      }
+    }
+  } else {
+    // debug printf error
+    Debug_Printf(0, 0, true, 0, "QR Code generation failed.");
+  }
+}
+
 extern "C" int __attribute__((section(".bootstrap.text"))) main(void) {
+  calcInit();
+
   BreakpointDialog dialog;
   dialog.ShowDialog();
+
+  calcEnd();
 
   exit(EXIT_SUCCESS);
 }
