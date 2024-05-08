@@ -1,6 +1,12 @@
 name: Release
 description: "Release a new binary of TarrasK"
 
+on:
+  push:
+    branches:
+      - master
+      - new-master
+
 defaults:
   run:
     shell: bash
