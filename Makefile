@@ -61,7 +61,7 @@ $(APP_ELF): $(OBJECTS) $(SDK_DIR)/sdk.o linker.ld
 $(SDK_DIR)/libsdk.a:
 	$(error You need to build the SDK before using it. Run make in the SDK directory, and check the README.md in the SDK directory for more information)
 
-$(BUILDDIR)/%.o: %.s
+$(BUILDDIR)/%.o: %.S
 	mkdir -p $(dir $@)
 	$(AS) -c $< -o $@ $(AS_FLAGS)
 
