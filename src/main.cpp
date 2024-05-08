@@ -176,55 +176,6 @@ extern "C" void BreakpointHandler(struct CPUState *cpuState) {
     carret_x = printBytes(registerAddr, 15, ++carret_x);
   }
 
-  LCD_Refresh();
-
-  // wait for key press
-  while (true) {
-    uint32_t key1, key2; // First create variables
-    key1 = 0;
-    key2 = 0;
-    getKey(&key1, &key2); // then read the keys
-    if (testKey(
-            key1, key2,
-            KEY_CLEAR)) { // Use testKey() to tests if a specific key is pressed
-      break;
-    }
-  }
-
-  // SECOND SET OF INFO - just for testing to see values change
-  Debug_Printf(0, 0, false, 0,
-               ":: TRK :: Breakpoint                               ::");
-  Debug_Printf(0, 1, true, 0, " r0  %08X r1  %08X r2  %08X r3  %08X ",
-               cpuStateCopy.r0, cpuStateCopy.r1, cpuStateCopy.r2,
-               cpuStateCopy.r3);
-  Debug_Printf(0, 2, true, 0, " r4  %08X r5  %08X r6  %08X r7  %08X ",
-               cpuStateCopy.r4, cpuStateCopy.r5, cpuStateCopy.r6,
-               cpuStateCopy.r7);
-  Debug_Printf(0, 3, true, 0, " r8  %08X r9  %08X r10 %08X r11 %08X ",
-               cpuStateCopy.r8, cpuStateCopy.r9, cpuStateCopy.r10,
-               cpuStateCopy.r11);
-  Debug_Printf(0, 4, true, 0, " r12 %08X r13 %08X r14 %08X r15 %08X ",
-               cpuStateCopy.r12, cpuStateCopy.r13, cpuStateCopy.r14,
-               cpuStateCopy.r15);
-  Debug_Printf(0, 5, true, 0, " gbr %08X pr  %08X ach %08X acl %08X ",
-               cpuStateCopy.gbr, cpuStateCopy.pr, cpuStateCopy.mach,
-               cpuStateCopy.macl);
-
-  LCD_Refresh();
-
-  // wait for key press
-  while (true) {
-    uint32_t key1, key2; // First create variables
-    key1 = 0;
-    key2 = 0;
-    getKey(&key1, &key2); // then read the keys
-    if (testKey(
-            key1, key2,
-            KEY_CLEAR)) { // Use testKey() to tests if a specific key is pressed
-      break;
-    }
-  }
-
   // qrcode with r0
   char qrText[300];
   sprintf(
